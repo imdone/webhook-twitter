@@ -1,16 +1,7 @@
-const crypto = require('crypto');
+const validateSignature = require('webhook-validate');
 const Twitter = require('twitter');
 const _ = require('lodash');
 const Task = require('imdone-core/lib/task');
-
-var getHMACDigest = function(body,cb) {
-    var secret = process.env.SECRET;
-    if (!(secret && _.isString(secret) && secret.length > 0)) return cb();
-    var hmac = crypto.createHmac("sha1", secret).setEncoding('hex');
-    hmac.end(body, function() {
-      cb(hmac.read());
-    });
-  };
 
 var routes = function(app) {
   var client = new Twitter({
@@ -28,10 +19,8 @@ var routes = function(app) {
   app.post('/', function(req, res) {
     // TODO: Figure out how to gain access to the glitch api and track TODOs in glitch
 
-    var signature = req.headers["x-imdone-signature"];
-    getHMACDigest(JSON.stringify(req.body), function(digest) {
-      console.log(req.body);
-      if (digest !== signature) return res.status(403);
+    validateSignature(req, function(valid) {
+      if (!valid) return res.status(403);
       var taskNow = new Task(req.body.taskNow);
       var list = taskNow.list;
       var text =  taskNow.getText({stripMeta: true, stripDates: true});
