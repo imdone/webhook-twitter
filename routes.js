@@ -27,8 +27,6 @@ var routes = function(app) {
   
   app.post('/', function(req, res) {
     // TODO: Figure out how to gain access to the glitch api and track TODOs in glitch
-    // DONE: Integrate with twitter using [desmondmorris/node-twitter: Client library for the Twitter REST and Streaming API's.](https://github.com/desmondmorris/node-twitter)
-    // DOING: Integrate with trello using [adunkman/node-trello: Node wrapper for Trello's HTTP API.](https://github.com/adunkman/node-trello)
 
     var signature = req.headers["x-imdone-signature"];
     getHMACDigest(JSON.stringify(req.body), function(digest) {
